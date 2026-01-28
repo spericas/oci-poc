@@ -1,0 +1,237 @@
+/*
+ * Copyright (c) 2026 Oracle and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package io.helidon.examples.oci.poc.jaxrs;
+
+import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.core.EntityTag;
+import jakarta.ws.rs.core.Link;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.NewCookie;
+import jakarta.ws.rs.core.Response;
+
+/**
+ * Simple implementation of ContainerResponseContext for filter processing.
+ */
+public class HelidonContainerResponseContext implements ContainerResponseContext {
+
+    private int status;
+    private Object entity;
+    private final MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>();
+    private final MultivaluedMap<String, String> stringHeaders = new MultivaluedHashMap<>();
+    private MediaType mediaType;
+
+    public HelidonContainerResponseContext(int status, Object entity) {
+        this.status = status;
+        this.entity = entity;
+    }
+
+    @Override
+    public int getStatus() {
+        return status;
+    }
+
+    @Override
+    public void setStatus(int code) {
+        this.status = code;
+    }
+
+    @Override
+    public Response.StatusType getStatusInfo() {
+        Response.Status statusEnum = Response.Status.fromStatusCode(status);
+        if (statusEnum != null) {
+            return statusEnum;
+        }
+        return new Response.StatusType() {
+            @Override
+            public int getStatusCode() {
+                return status;
+            }
+
+            @Override
+            public Response.Status.Family getFamily() {
+                return Response.Status.Family.familyOf(status);
+            }
+
+            @Override
+            public String getReasonPhrase() {
+                return "";
+            }
+        };
+    }
+
+    @Override
+    public void setStatusInfo(Response.StatusType statusInfo) {
+        if (statusInfo == null) {
+            return;
+        }
+        this.status = statusInfo.getStatusCode();
+    }
+
+    @Override
+    public MultivaluedMap<String, Object> getHeaders() {
+        return headers;
+    }
+
+    @Override
+    public MultivaluedMap<String, String> getStringHeaders() {
+        return stringHeaders;
+    }
+
+    @Override
+    public String getHeaderString(String name) {
+        List<String> values = stringHeaders.get(name);
+        if (values == null || values.isEmpty()) {
+            List<Object> rawValues = headers.get(name);
+            if (rawValues == null || rawValues.isEmpty()) {
+                return null;
+            }
+            List<String> mapped = new ArrayList<>();
+            for (Object value : rawValues) {
+                if (value != null) {
+                    mapped.add(value.toString());
+                }
+            }
+            return mapped.isEmpty() ? null : String.join(",", mapped);
+        }
+        return String.join(",", values);
+    }
+
+    @Override
+    public Set<String> getAllowedMethods() {
+        return Set.of();
+    }
+
+    @Override
+    public Date getDate() {
+        return null;
+    }
+
+    @Override
+    public Locale getLanguage() {
+        return null;
+    }
+
+    @Override
+    public int getLength() {
+        return -1;
+    }
+
+    @Override
+    public MediaType getMediaType() {
+        return mediaType;
+    }
+
+    @Override
+    public Map<String, NewCookie> getCookies() {
+        return Map.of();
+    }
+
+    @Override
+    public EntityTag getEntityTag() {
+        return null;
+    }
+
+    @Override
+    public Date getLastModified() {
+        return null;
+    }
+
+    @Override
+    public URI getLocation() {
+        return null;
+    }
+
+    @Override
+    public Set<Link> getLinks() {
+        return Set.of();
+    }
+
+    @Override
+    public boolean hasLink(String relation) {
+        return false;
+    }
+
+    @Override
+    public Link getLink(String relation) {
+        return null;
+    }
+
+    @Override
+    public Link.Builder getLinkBuilder(String relation) {
+        return null;
+    }
+
+    @Override
+    public boolean hasEntity() {
+        return entity != null;
+    }
+
+    @Override
+    public Object getEntity() {
+        return entity;
+    }
+
+    @Override
+    public Class<?> getEntityClass() {
+        return entity != null ? entity.getClass() : null;
+    }
+
+    @Override
+    public Type getEntityType() {
+        return getEntityClass();
+    }
+
+    @Override
+    public void setEntity(Object entity) {
+        this.entity = entity;
+    }
+
+    @Override
+    public void setEntity(Object entity, Annotation[] annotations, MediaType mediaType) {
+        this.entity = entity;
+        this.mediaType = mediaType;
+    }
+
+    @Override
+    public Annotation[] getEntityAnnotations() {
+        return new Annotation[0];
+    }
+
+    @Override
+    public OutputStream getEntityStream() {
+        throw new UnsupportedOperationException("getEntityStream not supported");
+    }
+
+    @Override
+    public void setEntityStream(OutputStream outputStream) {
+        throw new UnsupportedOperationException("setEntityStream not supported");
+    }
+}
+
+
