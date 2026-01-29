@@ -31,7 +31,7 @@ class EchoEndpoint {
     @Http.Consumes(MediaTypes.TEXT_PLAIN_VALUE)
     @Http.Produces(MediaTypes.TEXT_PLAIN_VALUE)
     @Authorized
-    String echo(@Http.Entity String message) {
+    String echo(@Http.Entity String message, @Http.HeaderParam("User") String user) {
         return message;
     }
 }

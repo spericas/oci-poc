@@ -15,12 +15,15 @@
  */
 package io.helidon.examples.oci.poc.echo;
 
+import java.util.List;
+
 import io.helidon.http.HeaderNames;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 
@@ -39,8 +42,11 @@ public class AuthorizationFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
-        String v = requestContext.getHeaders().getFirst(HeaderNames.AUTHORIZATION.defaultCase());
-        if (!"helidon".equals(v)) {
+        MultivaluedMap<String, String> headers = requestContext.getHeaders();
+        String v = headers.getFirst(HeaderNames.AUTHORIZATION.defaultCase());
+        if ("helidon".equals(v)) {
+            headers.put("User", List.of(v));        // adds User header
+        } else {
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
         }
     }

@@ -17,19 +17,15 @@ package io.helidon.examples.oci.poc.jaxrs;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import io.helidon.http.HeaderName;
-import io.helidon.http.HeaderNames;
 import io.helidon.webserver.http.ServerRequest;
 
 import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
 
 /**
@@ -37,30 +33,24 @@ import jakarta.ws.rs.core.MultivaluedMap;
  */
 public class HelidonHttpHeaders implements HttpHeaders {
 
-    private final ServerRequest request;
+    private final MultivaluedMap<String, String> headers;
 
     public HelidonHttpHeaders(ServerRequest request) {
-        this.request = request;
+        this.headers = new HelidonMultivaluedHashMap(request);
     }
 
     @Override
     public List<String> getRequestHeader(String name) {
-        HeaderName headerName = HeaderNames.create(name);
-        return request.headers().all(headerName, List::of);
+        return headers.get(name);
     }
 
     @Override
     public String getHeaderString(String name) {
-        HeaderName headerName = HeaderNames.create(name);
-        return request.headers().first(headerName).map(Object::toString).orElse(null);
+        return headers.getFirst(name);
     }
 
     @Override
     public MultivaluedMap<String, String> getRequestHeaders() {
-        MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
-        for (var header : request.headers()) {
-            headers.add(header.name(), header.values());
-        }
         return headers;
     }
 
@@ -111,22 +101,12 @@ public class HelidonHttpHeaders implements HttpHeaders {
 
     @Override
     public Map<String, Cookie> getCookies() {
-        Map<String, Cookie> cookies = new HashMap<>();
-        for (var entry : request.headers().cookies().toMap().entrySet()) {
-            String name = entry.getKey();
-            List<String> values = entry.getValue();
-            if (!values.isEmpty()) {
-                cookies.put(name, new Cookie(name, values.get(0)));
-            }
-        }
-        return cookies;
+        throw new UnsupportedOperationException("not yet implemented");
     }
 
     @Override
     public Date getDate() {
-        String date = getHeaderString("Date");
-        // Simplified: return null for now
-        return null;
+        throw new UnsupportedOperationException("not yet implemented");
     }
 
     @Override
