@@ -27,11 +27,27 @@ import io.helidon.webserver.http.RestServer;
 @Service.Singleton
 class EchoEndpoint {
 
+    @Http.GET
+    @Http.Produces(MediaTypes.TEXT_PLAIN_VALUE)
+    String ping() {
+        return "pong";
+    }
+
     @Http.POST
     @Http.Consumes(MediaTypes.TEXT_PLAIN_VALUE)
     @Http.Produces(MediaTypes.TEXT_PLAIN_VALUE)
+    @Http.Path("once")
     @Authorized
-    String echo(@Http.Entity String message, @Http.HeaderParam("User") String user) {
+    String once(@Http.Entity String message, @Http.HeaderParam("User") String user) {
         return message;
+    }
+
+    @Http.POST
+    @Http.Consumes(MediaTypes.TEXT_PLAIN_VALUE)
+    @Http.Produces(MediaTypes.TEXT_PLAIN_VALUE)
+    @Http.Path("twice")
+    @Authorized
+    String twice(@Http.Entity String message, @Http.HeaderParam("User") String user) {
+        return message + message;
     }
 }

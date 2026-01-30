@@ -6,13 +6,13 @@ A proof of concept (POC) that simulates interactions between a Helidon SE Declar
 
 Contains the sample Helidon SE Declarative application.
 
-
 #### EchoEndpoint
 
-A Helidon SE Declarative endpoint that exposes a single echo resource method annotated 
+A Helidon SE Declarative endpoint that exposes a few resource methods, some annotated 
 with `@Authorized` --simulating an Identity SDK annotation.
-The resource method is invoked only if the user is authorized. Upon successful 
-authorization, user information must be available in the `User` request header.
+Methods annotated with `@Authorized` are invoked only if the user is authorized. 
+Upon successful authorization, user information must be available in the `User` 
+request header.
 
 #### AuthorizationFilter
 
@@ -21,17 +21,17 @@ instances that are available only at (or after) `@PostConstruct`.
 The filter validates the user and, if successful, adds the `User` header to the 
 request.
 
-#### AuthorizationInterceptor
+#### EchoEndpointOnceInterceptor and EchoEndpointTwiceInterceptors
 
-A Helidon SE entry-point interceptor that executes when the echo resource method is 
-invoked. It is aware of the `@Authorized` annotation and is responsible for instantiating, 
-injecting, and invoking the `AuthorizationFilter`.
-If the filter does not abort processing, the interceptor proceeds with invoking the 
-echo method.
+Helidon SE entry-point interceptors for each of the methods in `EchoEndpoint` that
+are annotated by `Authorized`. These interceptors are used to call the corresponding
+authorization JAX-RS filters before the resource method is called.
+If the JAX-RS filter chain does not abort processing, the interceptor proceeds with 
+invoking the resource method.
 
-TODO: This interceptor should be code-generated using an annotation processor.
+TODO: These interceptors should be code-generated using an annotation processor.
 
-#### OciPocTest
+#### EchoEndpointTest
 
 Verifies that authorization behaves correctly by sending two requests: one with valid 
 credentials and one without.

@@ -28,16 +28,28 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 @ServerTest
-public class OciPocTest {
+public class EchoEndpointTest {
     private final Http1Client client;
 
-    public OciPocTest(Http1Client client) {
+    public EchoEndpointTest(Http1Client client) {
         this.client = client;
     }
 
     @Test
-    void testEchoSuccess() {
-        var response = client.post("/echo")
+    void testPing() {
+        try (var response = client.get("/echo")
+                .accept(MediaTypes.TEXT_PLAIN)
+                .header(HeaderNames.AUTHORIZATION, "foo")
+                .request()) {
+            assertThat(response.status(), is(Status.OK_200));
+            String entity = response.entity().as(String.class);
+            assertThat(entity, is("pong"));
+        }
+    }
+
+    @Test
+    void testOnceSuccess() {
+        var response = client.post("/echo/once")
                 .accept(MediaTypes.TEXT_PLAIN)
                 .contentType(MediaTypes.TEXT_PLAIN)
                 .header(HeaderNames.AUTHORIZATION, "helidon")
@@ -49,8 +61,32 @@ public class OciPocTest {
     }
 
     @Test
-    void testEchoFailure() {
-        var response = client.post("/echo")
+    void testTwiceSuccess() {
+        var response = client.post("/echo/twice")
+                .accept(MediaTypes.TEXT_PLAIN)
+                .contentType(MediaTypes.TEXT_PLAIN)
+                .header(HeaderNames.AUTHORIZATION, "helidon")
+                .submit("Hello World", String.class);
+
+        assertThat(response.status(), is(Status.OK_200));
+        String entity = response.entity();
+        assertThat(entity, is("Hello WorldHello World"));
+    }
+
+    @Test
+    void testOnceFailure() {
+        var response = client.post("/echo/once")
+                .accept(MediaTypes.TEXT_PLAIN)
+                .contentType(MediaTypes.TEXT_PLAIN)
+                .header(HeaderNames.AUTHORIZATION, "foo")
+                .submit("Hello World", String.class);
+
+        assertThat(response.status(), is(Status.UNAUTHORIZED_401));
+    }
+
+    @Test
+    void testTwiceFailure() {
+        var response = client.post("/echo/twice")
                 .accept(MediaTypes.TEXT_PLAIN)
                 .contentType(MediaTypes.TEXT_PLAIN)
                 .header(HeaderNames.AUTHORIZATION, "foo")
