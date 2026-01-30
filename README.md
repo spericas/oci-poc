@@ -21,15 +21,13 @@ instances that are available only at (or after) `@PostConstruct`.
 The filter validates the user and, if successful, adds the `User` header to the 
 request.
 
-#### AuthorizationInterceptor
+#### OciFilterInterceptor
 
-A Helidon SE entry-point interceptor that executes when the echo resource method is 
-invoked. It is aware of the `@Authorized` annotation and is responsible for instantiating, 
-injecting, and invoking the `AuthorizationFilter`.
-If the filter does not abort processing, the interceptor proceeds with invoking the 
-echo method.
-
-TODO: This interceptor should be code-generated using an annotation processor.
+A Helidon SE entry-point interceptor that executes a sequence of JAX-RS filters
+based on the annotations on a resource method. For example, it can execute
+the `AuthorizationFilter` for a method annotated by `@Authorized`.
+If the filter sequence does not abort processing, the interceptor proceeds with 
+invoking the echo method.
 
 #### OciPocTest
 
