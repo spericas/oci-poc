@@ -35,6 +35,7 @@
     <version>1.0.0-SNAPSHOT</version>
 
     <modules>
+        <module>codegen</module>
         <module>jaxrs</module>
         <module>echo</module>
     </modules>
