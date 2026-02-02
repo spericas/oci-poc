@@ -21,20 +21,18 @@ instances that are available only at (or after) `@PostConstruct`.
 The filter validates the user and, if successful, adds the `User` header to the 
 request.
 
-#### EchoEndpointOnceInterceptor and EchoEndpointTwiceInterceptors
-
-Helidon SE entry-point interceptors for each of the methods in `EchoEndpoint` that
-are annotated by `Authorized`. These interceptors are used to call the corresponding
-authorization JAX-RS filters before the resource method is called.
-If the JAX-RS filter chain does not abort processing, the interceptor proceeds with 
-invoking the resource method.
-
-TODO: These interceptors should be code-generated using an annotation processor.
-
 #### EchoEndpointTest
 
 Verifies that authorization behaves correctly by sending two requests: one with valid 
 credentials and one without.
+
+### Module: helidon-examples-oci-poc-codegen
+
+Annotation processor that generates a Helidon SE entry-point interceptor for each
+method annotated with `@Authorized`. These interceptors are used to call the corresponding
+authorization JAX-RS filters before the resource method is called.
+If the JAX-RS filter chain does not abort processing, the interceptor proceeds with
+invoking the resource method.
 
 ### Module: helidon-examples-oci-poc-jaxrs
 

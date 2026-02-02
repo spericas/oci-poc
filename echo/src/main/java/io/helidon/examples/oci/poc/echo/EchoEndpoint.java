@@ -42,7 +42,7 @@ class EchoEndpoint {
     @Http.Path("once")
     @Authorized
     String once(@Http.Entity String message, @Http.HeaderParam("User") String user) {
-        LOGGER.log(Level.DEBUG, "Resource method 'once'");
+        LOGGER.log(Level.DEBUG, "Resource method 'once' for user '" + user + "'");
         return message;
     }
 
@@ -52,7 +52,7 @@ class EchoEndpoint {
     @Http.Path("twice")
     @Authorized
     String twice(@Http.Entity String message, @Http.HeaderParam("User") String user) {
-        LOGGER.log(Level.DEBUG, "Resource method 'twice'");
+        LOGGER.log(Level.DEBUG, "Resource method 'twice' for user '" + user + "'");
         return message + message;
     }
 }
