@@ -40,9 +40,13 @@ class OciExtension implements RegistryCodegenExtension {
     @Override
     public void process(RegistryRoundContext roundContext) {
         for (TypeInfo typeInfo : roundContext.types()) {
+            int index = 0;
             for (TypedElementInfo elementInfo : typeInfo.elementInfo()) {
                 if (elementInfo.hasAnnotation(OciTypes.AUTHORIZED_ANNOTATION)) {
-                    var generatedType = generatedTypeName(typeInfo.typeName(), elementInfo, OciTypes.AUTHORIZED_ANNOTATION);
+                    var generatedType = generatedTypeName(typeInfo.typeName(),
+                                                          elementInfo,
+                                                          OciTypes.AUTHORIZED_ANNOTATION,
+                                                          index++);
                     generateInterceptor(roundContext, generatedType, typeInfo, elementInfo);
                 }
             }
@@ -56,17 +60,43 @@ class OciExtension implements RegistryCodegenExtension {
         ClassModel.Builder builder = ClassModel.builder()
                 .accessModifier(AccessModifier.PACKAGE_PRIVATE)
                 .addAnnotation(Annotation.create(ServiceCodegenTypes.SERVICE_ANNOTATION_SINGLETON))
-                // .copyright(CodegenUtil.copyright(generator, enclosingType, generatedType))
                 .type(generatedType)
                 .addInterface(OciTypes.HTTP_ENTRYPOINT_INTERCEPTOR)
                 .sortStaticFields(false);
+
+        builder.addImport(TypeNames.TYPE_NAME)
+                .addImport(TypeNames.TYPED_ELEMENT_INFO)
+                .addImport("io.helidon.examples.oci.poc.echo.AuthorizationFilter")
+                .addImport("io.helidon.examples.oci.poc.jaxrs.HelidonContainerRequestContext")
+                .addImport("io.helidon.examples.oci.poc.jaxrs.HelidonContextInjector");
+
+        builder.addField(field -> field.name("LOGGER")
+                .isStatic(true)
+                .isFinal(true)
+                .accessModifier(AccessModifier.PRIVATE)
+                .type("System.Logger")
+                .addContent("System.getLogger(\"" + generatedType.name() + "\")"));
+
+        builder.addField(field -> field.name("TYPE_NAME")
+                .isStatic(true)
+                .isFinal(true)
+                .accessModifier(AccessModifier.PRIVATE)
+                .type(TypeNames.TYPE_NAME)
+                .addContent("TypeName.create(\"" + typeInfo.typeName() + "\")"));
+
+        builder.addField(field -> field.name("ELEMENT_SIGNATURE")
+                .isStatic(true)
+                .isFinal(true)
+                .accessModifier(AccessModifier.PRIVATE)
+                .type(TypeNames.STRING)
+                .addContent("\"" + elementInfo.signature() + "\""));
 
         builder.addMethod(proceed -> proceed.addAnnotation(Annotations.OVERRIDE)
                 .returnType(TypeNames.PRIMITIVE_VOID)
                 .accessModifier(AccessModifier.PUBLIC)
                 .name("proceed")
                 .addParameter(p -> p.type(OciTypes.INTERCEPTOR_CONTEXT)
-                        .name("interceptorContext"))
+                        .name("interceptionContext"))
                 .addParameter(p -> p.type(OciTypes.CHAIN)
                         .name("chain"))
                 .addParameter(p -> p.type(OciTypes.SERVER_REQUEST)
@@ -74,7 +104,28 @@ class OciExtension implements RegistryCodegenExtension {
                 .addParameter(p -> p.type(OciTypes.SERVER_RESPONSE)
                         .name("response"))
                 .addThrows(t -> t.type(Exception.class))
-                .addContentLine("chain.proceed(request, response);"));
+                .addContentLine("""
+                                        TypedElementInfo typedElementInfo = interceptionContext.elementInfo();
+                                        
+                                        if (interceptionContext.serviceInfo().serviceType().equals(TYPE_NAME) &&
+                                                typedElementInfo.signature().toString().equals(ELEMENT_SIGNATURE)) {
+                                            LOGGER.log(System.Logger.Level.DEBUG, "Intercepting call '" +  ELEMENT_SIGNATURE + "'");
+                                        
+                                            AuthorizationFilter filter = new AuthorizationFilter();
+                                            HelidonContainerRequestContext context = new HelidonContainerRequestContext(request);
+                                            HelidonContextInjector.inject(filter, context);
+                                            HelidonContextInjector.postConstruct(filter, context);
+                                        
+                                            filter.filter(context);
+                                        
+                                            if (context.isAborted()) {
+                                                String msg = context.getAbortMessage();
+                                                response.status(context.getAbortStatus()).send(msg != null ? msg : "");
+                                                return;
+                                            }
+                                        }
+                                        
+                                        chain.proceed(request, response);"""));
 
         roundContext.addGeneratedType(generatedType,
                                       builder,
@@ -83,12 +134,14 @@ class OciExtension implements RegistryCodegenExtension {
 
     private TypeName generatedTypeName(TypeName typeName,
                                        TypedElementInfo element,
-                                       TypeName annotation) {
+                                       TypeName annotation,
+                                       int index) {
         return TypeName.builder()
                 .packageName(typeName.packageName())
                 .className(typeName.classNameWithEnclosingNames().replace('.', '_') + "_"
                                    + element.elementName()
-                                   + "__" + annotation.className())
+                                   + "_" + index
+                                   + "_" + annotation.className())
                 .build();
 
     }

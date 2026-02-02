@@ -21,11 +21,14 @@ import io.helidon.http.Http;
 import io.helidon.service.registry.Service;
 import io.helidon.webserver.http.RestServer;
 
+import static java.lang.System.Logger.Level;
+
 @SuppressWarnings("deprecation")
 @RestServer.Endpoint
 @Http.Path("/echo")
 @Service.Singleton
 class EchoEndpoint {
+    private static final System.Logger LOGGER = System.getLogger(AuthorizationFilter.class.getName());
 
     @Http.GET
     @Http.Produces(MediaTypes.TEXT_PLAIN_VALUE)
@@ -39,6 +42,7 @@ class EchoEndpoint {
     @Http.Path("once")
     @Authorized
     String once(@Http.Entity String message, @Http.HeaderParam("User") String user) {
+        LOGGER.log(Level.DEBUG, "Resource method 'once'");
         return message;
     }
 
@@ -48,6 +52,7 @@ class EchoEndpoint {
     @Http.Path("twice")
     @Authorized
     String twice(@Http.Entity String message, @Http.HeaderParam("User") String user) {
+        LOGGER.log(Level.DEBUG, "Resource method 'twice'");
         return message + message;
     }
 }

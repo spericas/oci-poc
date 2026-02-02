@@ -27,7 +27,10 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 
+import static java.lang.System.Logger.Level;
+
 public class AuthorizationFilter implements ContainerRequestFilter {
+    private static final System.Logger LOGGER = System.getLogger(AuthorizationFilter.class.getName());
 
     @Context
     private UriInfo uriInfo;
@@ -45,8 +48,10 @@ public class AuthorizationFilter implements ContainerRequestFilter {
         MultivaluedMap<String, String> headers = requestContext.getHeaders();
         String v = headers.getFirst(HeaderNames.AUTHORIZATION.defaultCase());
         if ("helidon".equals(v)) {
+            LOGGER.log(Level.DEBUG, "Authorizing access '" + requestContext.getUriInfo().getPath() + "'");
             headers.put("User", List.of(v));        // adds User header
         } else {
+            LOGGER.log(Level.DEBUG, "Rejecting access '" + requestContext.getUriInfo().getPath() + "'");
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
         }
     }

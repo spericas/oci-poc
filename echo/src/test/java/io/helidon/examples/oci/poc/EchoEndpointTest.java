@@ -22,12 +22,16 @@ import io.helidon.http.Status;
 import io.helidon.webclient.http1.Http1Client;
 import io.helidon.webserver.testing.junit5.ServerTest;
 
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 @ServerTest
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class EchoEndpointTest {
     private final Http1Client client;
 
@@ -36,6 +40,7 @@ public class EchoEndpointTest {
     }
 
     @Test
+    @Order(1)
     void testPing() {
         try (var response = client.get("/echo")
                 .accept(MediaTypes.TEXT_PLAIN)
@@ -48,6 +53,7 @@ public class EchoEndpointTest {
     }
 
     @Test
+    @Order(2)
     void testOnceSuccess() {
         var response = client.post("/echo/once")
                 .accept(MediaTypes.TEXT_PLAIN)
@@ -61,6 +67,7 @@ public class EchoEndpointTest {
     }
 
     @Test
+    @Order(3)
     void testTwiceSuccess() {
         var response = client.post("/echo/twice")
                 .accept(MediaTypes.TEXT_PLAIN)
@@ -74,6 +81,7 @@ public class EchoEndpointTest {
     }
 
     @Test
+    @Order(4)
     void testOnceFailure() {
         var response = client.post("/echo/once")
                 .accept(MediaTypes.TEXT_PLAIN)
@@ -85,6 +93,7 @@ public class EchoEndpointTest {
     }
 
     @Test
+    @Order(5)
     void testTwiceFailure() {
         var response = client.post("/echo/twice")
                 .accept(MediaTypes.TEXT_PLAIN)
