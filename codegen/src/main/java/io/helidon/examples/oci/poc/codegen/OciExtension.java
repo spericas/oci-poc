@@ -16,7 +16,13 @@
 
 package io.helidon.examples.oci.poc.codegen;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import io.helidon.codegen.classmodel.ClassModel;
+import io.helidon.codegen.classmodel.Field;
 import io.helidon.common.types.AccessModifier;
 import io.helidon.common.types.Annotation;
 import io.helidon.common.types.Annotations;
@@ -32,6 +38,7 @@ import io.helidon.service.codegen.spi.RegistryCodegenExtension;
 class OciExtension implements RegistryCodegenExtension {
 
     private final RegistryCodegenContext ctx;
+    private final Map<String, Set<String>> methods = new HashMap<>();
 
     OciExtension(RegistryCodegenContext ctx) {
         this.ctx = ctx;
@@ -39,24 +46,34 @@ class OciExtension implements RegistryCodegenExtension {
 
     @Override
     public void process(RegistryRoundContext roundContext) {
+        // init processing
+        methods.clear();
+
+        // collect all methods and group them by package
         for (TypeInfo typeInfo : roundContext.types()) {
-            int index = 0;
             for (TypedElementInfo elementInfo : typeInfo.elementInfo()) {
                 if (elementInfo.hasAnnotation(OciTypes.AUTHORIZED_ANNOTATION)) {
-                    var generatedType = generatedTypeName(typeInfo.typeName(),
-                                                          elementInfo,
-                                                          OciTypes.AUTHORIZED_ANNOTATION,
-                                                          index++);
-                    generateInterceptor(roundContext, generatedType, typeInfo, elementInfo);
+                    String packageName = typeInfo.typeName().packageName();
+                    Set<String> set = methods.computeIfAbsent(packageName, k -> new HashSet<>());
+                    set.add(typeInfo.typeName().toString() + "::" + elementInfo.signature().toString());
                 }
             }
+        }
+
+        // generate an interceptor per package
+        for (String packageName : methods.keySet()) {
+            Set<String> methodElements = methods.get(packageName);
+            TypeName generatedType = TypeName.builder()
+                    .packageName(packageName)
+                    .className("Authorized_interceptor")
+                    .build();
+            generateInterceptor(roundContext, generatedType, methodElements);
         }
     }
 
     private void generateInterceptor(RegistryRoundContext roundContext,
                                      TypeName generatedType,
-                                     TypeInfo typeInfo,
-                                     TypedElementInfo elementInfo) {
+                                     Set<String> methodElements) {
         ClassModel.Builder builder = ClassModel.builder()
                 .accessModifier(AccessModifier.PACKAGE_PRIVATE)
                 .addAnnotation(Annotation.create(ServiceCodegenTypes.SERVICE_ANNOTATION_SINGLETON))
@@ -64,8 +81,10 @@ class OciExtension implements RegistryCodegenExtension {
                 .addInterface(OciTypes.HTTP_ENTRYPOINT_INTERCEPTOR)
                 .sortStaticFields(false);
 
-        builder.addImport(TypeNames.TYPE_NAME)
+        builder.addImport(TypeNames.SET)
+                .addImport(TypeNames.TYPE_NAME)
                 .addImport(TypeNames.TYPED_ELEMENT_INFO)
+                .addImport("java.util.HashSet")
                 .addImport("io.helidon.examples.oci.poc.echo.AuthorizationFilter")
                 .addImport("io.helidon.examples.oci.poc.jaxrs.HelidonContainerRequestContext")
                 .addImport("io.helidon.examples.oci.poc.jaxrs.HelidonContextInjector");
@@ -77,19 +96,24 @@ class OciExtension implements RegistryCodegenExtension {
                 .type("System.Logger")
                 .addContent("System.getLogger(\"" + generatedType.name() + "\")"));
 
-        builder.addField(field -> field.name("TYPE_NAME")
+        Field.Builder fieldBuilder = Field.builder();
+        fieldBuilder.name("INTERCEPTED_METHODS")
                 .isStatic(true)
                 .isFinal(true)
                 .accessModifier(AccessModifier.PRIVATE)
-                .type(TypeNames.TYPE_NAME)
-                .addContent("TypeName.create(\"" + typeInfo.typeName() + "\")"));
-
-        builder.addField(field -> field.name("ELEMENT_SIGNATURE")
-                .isStatic(true)
-                .isFinal(true)
-                .accessModifier(AccessModifier.PRIVATE)
-                .type(TypeNames.STRING)
-                .addContent("\"" + elementInfo.signature() + "\""));
+                .type("Set<String>")
+                .addContent("new HashSet(Set.of(\n")
+                .increaseContentPadding();
+        boolean first = true;
+        for (String methodElement : methodElements) {
+            if (!first) {
+                fieldBuilder.addContent(",\n");
+            }
+            first = false;
+            fieldBuilder.addContent("\"" + methodElement + "\"");
+        }
+        fieldBuilder.addContent("))");
+        builder.addField(fieldBuilder.build());
 
         builder.addMethod(proceed -> proceed.addAnnotation(Annotations.OVERRIDE)
                 .returnType(TypeNames.PRIMITIVE_VOID)
@@ -106,43 +130,29 @@ class OciExtension implements RegistryCodegenExtension {
                 .addThrows(t -> t.type(Exception.class))
                 .addContentLine("""
                                         TypedElementInfo typedElementInfo = interceptionContext.elementInfo();
+                                         String method = interceptionContext.serviceInfo().serviceType().toString() + "::" + typedElementInfo.signature();
                                         
-                                        if (interceptionContext.serviceInfo().serviceType().equals(TYPE_NAME) &&
-                                                typedElementInfo.signature().toString().equals(ELEMENT_SIGNATURE)) {
-                                            LOGGER.log(System.Logger.Level.DEBUG, "Intercepting call '" +  ELEMENT_SIGNATURE + "'");
+                                         if (INTERCEPTED_METHODS.contains(method)) {
+                                             LOGGER.log(System.Logger.Level.DEBUG, "Intercepting call '" + typedElementInfo.signature() + "'");
                                         
-                                            AuthorizationFilter filter = new AuthorizationFilter();
-                                            HelidonContainerRequestContext context = new HelidonContainerRequestContext(request);
-                                            HelidonContextInjector.inject(filter, context);
-                                            HelidonContextInjector.postConstruct(filter, context);
+                                             AuthorizationFilter filter = new AuthorizationFilter();
+                                             HelidonContainerRequestContext context = new HelidonContainerRequestContext(request);
+                                             HelidonContextInjector.inject(filter, context);
+                                             HelidonContextInjector.postConstruct(filter, context);
                                         
-                                            filter.filter(context);
+                                             filter.filter(context);
                                         
-                                            if (context.isAborted()) {
+                                             if (context.isAborted()) {
                                                 String msg = context.getAbortMessage();
                                                 response.status(context.getAbortStatus()).send(msg != null ? msg : "");
                                                 return;
-                                            }
-                                        }
-                                        
-                                        chain.proceed(request, response);"""));
+                                             }
+                                         }
+                            
+                                         chain.proceed(request, response);"""));
 
         roundContext.addGeneratedType(generatedType,
                                       builder,
                                       generatedType);
-    }
-
-    private TypeName generatedTypeName(TypeName typeName,
-                                       TypedElementInfo element,
-                                       TypeName annotation,
-                                       int index) {
-        return TypeName.builder()
-                .packageName(typeName.packageName())
-                .className(typeName.classNameWithEnclosingNames().replace('.', '_') + "_"
-                                   + element.elementName()
-                                   + "_" + index
-                                   + "_" + annotation.className())
-                .build();
-
     }
 }
