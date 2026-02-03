@@ -124,22 +124,22 @@ public class HelidonContainerResponseContext implements ContainerResponseContext
 
     @Override
     public Set<String> getAllowedMethods() {
-        return Set.of();
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public Date getDate() {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public Locale getLanguage() {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public int getLength() {
-        return -1;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -149,42 +149,42 @@ public class HelidonContainerResponseContext implements ContainerResponseContext
 
     @Override
     public Map<String, NewCookie> getCookies() {
-        return Map.of();
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public EntityTag getEntityTag() {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public Date getLastModified() {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public URI getLocation() {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public Set<Link> getLinks() {
-        return Set.of();
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public boolean hasLink(String relation) {
-        return false;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public Link getLink(String relation) {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public Link.Builder getLinkBuilder(String relation) {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -220,17 +220,17 @@ public class HelidonContainerResponseContext implements ContainerResponseContext
 
     @Override
     public Annotation[] getEntityAnnotations() {
-        return new Annotation[0];
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public OutputStream getEntityStream() {
-        throw new UnsupportedOperationException("getEntityStream not supported");
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public void setEntityStream(OutputStream outputStream) {
-        throw new UnsupportedOperationException("setEntityStream not supported");
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }
 

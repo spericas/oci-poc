@@ -50,7 +50,7 @@ public class HelidonResponse extends Response {
 
     @Override
     public StatusType getStatusInfo() {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -60,117 +60,116 @@ public class HelidonResponse extends Response {
 
     @Override
     public <T> T readEntity(Class<T> entityType) {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public <T> T readEntity(GenericType<T> entityType) {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public <T> T readEntity(Class<T> entityType, Annotation[] annotations) {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public <T> T readEntity(GenericType<T> entityType, Annotation[] annotations) {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public boolean hasEntity() {
-        return false;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public boolean bufferEntity() {
-        return false;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public void close() {
-
     }
 
     @Override
     public MediaType getMediaType() {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public Locale getLanguage() {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public int getLength() {
-        return 0;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public Set<String> getAllowedMethods() {
-        return Set.of();
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public Map<String, NewCookie> getCookies() {
-        return Map.of();
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public EntityTag getEntityTag() {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public Date getDate() {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public Date getLastModified() {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public URI getLocation() {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public Set<Link> getLinks() {
-        return Set.of();
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public boolean hasLink(String relation) {
-        return false;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public Link getLink(String relation) {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public Link.Builder getLinkBuilder(String relation) {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public MultivaluedMap<String, Object> getMetadata() {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public MultivaluedMap<String, String> getStringHeaders() {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public String getHeaderString(String name) {
-        return "";
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     static class ResponseBuilder extends Response.ResponseBuilder {
@@ -180,12 +179,12 @@ public class HelidonResponse extends Response {
 
         @Override
         public Response build() {
-            return new  HelidonResponse(this);
+            return new HelidonResponse(this);
         }
 
         @Override
         public Response.ResponseBuilder clone() {
-            return null;
+            throw new UnsupportedOperationException("Not supported yet.");
         }
 
         @Override
@@ -203,127 +202,127 @@ public class HelidonResponse extends Response {
 
         @Override
         public Response.ResponseBuilder entity(Object entity) {
-            return null;
+            throw new UnsupportedOperationException("Not supported yet.");
         }
 
         @Override
         public Response.ResponseBuilder entity(Object entity, Annotation[] annotations) {
-            return null;
+            throw new UnsupportedOperationException("Not supported yet.");
         }
 
         @Override
         public Response.ResponseBuilder allow(String... methods) {
-            return null;
+            throw new UnsupportedOperationException("Not supported yet.");
         }
 
         @Override
         public Response.ResponseBuilder allow(Set<String> methods) {
-            return null;
+            throw new UnsupportedOperationException("Not supported yet.");
         }
 
         @Override
         public Response.ResponseBuilder cacheControl(CacheControl cacheControl) {
-            return null;
+            throw new UnsupportedOperationException("Not supported yet.");
         }
 
         @Override
         public Response.ResponseBuilder encoding(String encoding) {
-            return null;
+            throw new UnsupportedOperationException("Not supported yet.");
         }
 
         @Override
         public Response.ResponseBuilder header(String name, Object value) {
-            return null;
+            throw new UnsupportedOperationException("Not supported yet.");
         }
 
         @Override
         public Response.ResponseBuilder replaceAll(MultivaluedMap<String, Object> headers) {
-            return null;
+            throw new UnsupportedOperationException("Not supported yet.");
         }
 
         @Override
         public Response.ResponseBuilder language(String language) {
-            return null;
+            throw new UnsupportedOperationException("Not supported yet.");
         }
 
         @Override
         public Response.ResponseBuilder language(Locale language) {
-            return null;
+            throw new UnsupportedOperationException("Not supported yet.");
         }
 
         @Override
         public Response.ResponseBuilder type(MediaType type) {
-            return null;
+            throw new UnsupportedOperationException("Not supported yet.");
         }
 
         @Override
         public Response.ResponseBuilder type(String type) {
-            return null;
+            throw new UnsupportedOperationException("Not supported yet.");
         }
 
         @Override
         public Response.ResponseBuilder variant(Variant variant) {
-            return null;
+            throw new UnsupportedOperationException("Not supported yet.");
         }
 
         @Override
         public Response.ResponseBuilder contentLocation(URI location) {
-            return null;
+            throw new UnsupportedOperationException("Not supported yet.");
         }
 
         @Override
         public Response.ResponseBuilder cookie(NewCookie... cookies) {
-            return null;
+            throw new UnsupportedOperationException("Not supported yet.");
         }
 
         @Override
         public Response.ResponseBuilder expires(Date expires) {
-            return null;
+            throw new UnsupportedOperationException("Not supported yet.");
         }
 
         @Override
         public Response.ResponseBuilder lastModified(Date lastModified) {
-            return null;
+            throw new UnsupportedOperationException("Not supported yet.");
         }
 
         @Override
         public Response.ResponseBuilder location(URI location) {
-            return null;
+            throw new UnsupportedOperationException("Not supported yet.");
         }
 
         @Override
         public Response.ResponseBuilder tag(EntityTag tag) {
-            return null;
+            throw new UnsupportedOperationException("Not supported yet.");
         }
 
         @Override
         public Response.ResponseBuilder tag(String tag) {
-            return null;
+            throw new UnsupportedOperationException("Not supported yet.");
         }
 
         @Override
         public Response.ResponseBuilder variants(Variant... variants) {
-            return null;
+            throw new UnsupportedOperationException("Not supported yet.");
         }
 
         @Override
         public Response.ResponseBuilder variants(List<Variant> variants) {
-            return null;
+            throw new UnsupportedOperationException("Not supported yet.");
         }
 
         @Override
         public Response.ResponseBuilder links(Link... links) {
-            return null;
+            throw new UnsupportedOperationException("Not supported yet.");
         }
 
         @Override
         public Response.ResponseBuilder link(URI uri, String rel) {
-            return null;
+            throw new UnsupportedOperationException("Not supported yet.");
         }
 
         @Override
         public Response.ResponseBuilder link(String uri, String rel) {
-            return null;
+            throw new UnsupportedOperationException("Not supported yet.");
         }
     }
 }

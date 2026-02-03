@@ -138,7 +138,7 @@ class OciExtension implements RegistryCodegenExtension {
                                              AuthorizationFilter filter = new AuthorizationFilter();
                                              HelidonContainerRequestContext context = new HelidonContainerRequestContext(request);
                                              HelidonContextInjector.inject(filter, context);
-                                             HelidonContextInjector.postConstruct(filter, context);
+                                             HelidonContextInjector.postConstruct(filter);
                                         
                                              filter.filter(context);
                                         

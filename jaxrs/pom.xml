@@ -33,6 +33,10 @@
     <name>Helidon OCI POC JAX-RS</name>
     <version>1.0.0-SNAPSHOT</version>
 
+    <properties>
+        <jakarta.servlet.api.version>6.0.0</jakarta.servlet.api.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>io.helidon.webserver</groupId>
@@ -45,6 +49,11 @@
         <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>${jakarta.servlet.api.version}</version>
         </dependency>
         <dependency>
             <groupId>io.helidon.logging</groupId>

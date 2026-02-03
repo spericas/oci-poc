@@ -124,17 +124,17 @@ public class HelidonContainerRequestContext implements ContainerRequestContext {
 
     @Override
     public void setRequestUri(URI requestUri) {
-        throw new UnsupportedOperationException("setRequestUri not supported");
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public void setRequestUri(URI baseUri, URI requestUri) {
-        throw new UnsupportedOperationException("setRequestUri not supported");
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public Request getRequest() {
-        throw new UnsupportedOperationException("getRequest not supported");
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -144,7 +144,7 @@ public class HelidonContainerRequestContext implements ContainerRequestContext {
 
     @Override
     public void setMethod(String method) {
-        throw new UnsupportedOperationException("setMethod not supported");
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override

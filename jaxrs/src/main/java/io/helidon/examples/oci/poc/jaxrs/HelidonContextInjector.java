@@ -20,6 +20,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.UriInfo;
 
@@ -28,6 +30,28 @@ public class HelidonContextInjector {
     private HelidonContextInjector() {
     }
 
+    /**
+     * Performs field‑level injection of JAX‑RS {@code @Context}‑annotated members on the supplied
+     * {@code instance}.  The method inspects every declared field of the object's runtime class,
+     * looks for the {@link jakarta.ws.rs.core.Context} annotation and, if present, attempts to set
+     * the field to an appropriate Helidon‑specific implementation based on the field type.
+     *
+     * <p>If a field is annotated with {@code @Context} but its type is not one of the
+     * supported types above, an {@link java.lang.UnsupportedOperationException} is thrown.
+     *
+     * <p>All fields are made {@code accessible} via reflection before the injection is performed.
+     * Any reflection‑related problems (illegal arguments, illegal access, etc.) are wrapped in a
+     * {@link RuntimeException} and re‑thrown.
+     *
+     * @param instance the object whose {@code @Context} fields should be populated; must not be
+     *                 {@code null}
+     * @param context  the Helidon request context that provides the underlying
+     *                 {@link io.helidon.webserver.http.ServerRequest}
+     *                 used to create concrete implementations; must not be {@code null}
+     * @throws NullPointerException          if {@code instance} or {@code context} is {@code null}
+     * @throws UnsupportedOperationException if a {@code @Context} field has an unsupported type
+     * @throws RuntimeException              if reflection fails while setting a field
+     */
     public static void inject(Object instance, HelidonContainerRequestContext context) {
         Class<?> clazz = instance.getClass();
 
@@ -35,23 +59,42 @@ public class HelidonContextInjector {
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
             field.setAccessible(true);
-            Annotation annotation  = field.getAnnotation(Context.class);
+            Annotation annotation = field.getAnnotation(Context.class);
             if (annotation != null) {
                 Class<?> fieldType = field.getType();
-                if (fieldType.equals(UriInfo.class)) {
-                    try {
+                try {
+                    if (fieldType.equals(UriInfo.class)) {
                         field.set(instance, new HelidonUriInfo(context.getServerRequest()));
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
+                    } else if (fieldType.equals(ResourceInfo.class)) {
+                        field.set(instance, new HelidonResourceInfo(context.getServerRequest()));
+                    } else if (fieldType.equals(HttpServletRequest.class)) {
+                        field.set(instance, new HelidonHttpServletRequest(context.getServerRequest()));
+                    } else {
+                        throw new UnsupportedOperationException("@Context annotation is not supported for " + fieldType);
                     }
-                } else {
-                    throw new UnsupportedOperationException("@Context annotation is not supported");
+                } catch (IllegalArgumentException | IllegalAccessException e) {
+                    throw new RuntimeException(e);
                 }
             }
         }
     }
 
-    public static void postConstruct(Object instance, HelidonContainerRequestContext context) {
+    /**
+     * Invokes the first {@code @PostConstruct} method (if any) declared on the supplied object.
+     *
+     * <p>This helper is used by Helidon’s JAX‑RS runtime to perform lifecycle callbacks on
+     * resource or provider instances after all {@code @Context} fields have been injected.
+     *
+     * <p>If the class does not declare a matching {@code @PostConstruct} method the call
+     * is a no‑op.
+     *
+     * @param instance the object whose lifecycle callback should be executed; must not be
+     *                 {@code null}
+     * @throws NullPointerException if {@code instance} or {@code context} is {@code null}
+     * @throws RuntimeException     if the {@code @PostConstruct} method throws an
+     *                              exception or if reflection fails
+     */
+    public static void postConstruct(Object instance) {
         Class<?> clazz = instance.getClass();
 
         // call @PostConstruct if defined
