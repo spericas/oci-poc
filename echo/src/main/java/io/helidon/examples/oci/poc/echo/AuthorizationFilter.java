@@ -15,6 +15,7 @@
  */
 package io.helidon.examples.oci.poc.echo;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 import io.helidon.http.HeaderNames;
@@ -22,6 +23,7 @@ import io.helidon.http.HeaderNames;
 import jakarta.annotation.PostConstruct;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
@@ -34,6 +36,9 @@ public class AuthorizationFilter implements ContainerRequestFilter {
 
     @Context
     private UriInfo uriInfo;
+
+    @Context
+    private ResourceInfo resourceInfo;
 
     public AuthorizationFilter() {
     }
@@ -59,6 +64,14 @@ public class AuthorizationFilter implements ContainerRequestFilter {
     private void validate() {
         if (uriInfo == null) {
             throw new IllegalStateException("Missing UriInfo");
+        }
+        if (resourceInfo == null) {
+            throw new IllegalStateException("Missing ResourceInfo");
+        }
+        Class<?> clazz = resourceInfo.getResourceClass();
+        Method method = resourceInfo.getResourceMethod();
+        if (clazz == null || method == null) {
+            throw new IllegalStateException("Missing ResourceInfo class and method");
         }
     }
 }

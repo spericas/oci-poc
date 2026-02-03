@@ -16,26 +16,95 @@
 package io.helidon.examples.oci.poc.jaxrs;
 
 import java.lang.reflect.Method;
-
-import io.helidon.webserver.http.ServerRequest;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 
 import jakarta.ws.rs.container.ResourceInfo;
 
 public class HelidonResourceInfo implements ResourceInfo {
 
-    private final ServerRequest request;
+    static final Map<String, Method> METHOD_MAP = new HashMap<>();
+    static final ReadWriteLock METHOD_MAP_LOCK = new ReentrantReadWriteLock();
 
-    HelidonResourceInfo(ServerRequest request) {
-        this.request = request;
+    private final String serviceType;
+    private final String methodSignature;
+    private final String mapKey;
+
+
+    private Method method;
+    private Class<?> resourceClass;
+
+    public HelidonResourceInfo(String serviceType, String methodSignature) {
+        this.serviceType = serviceType;
+        this.methodSignature = methodSignature;
+        this.mapKey = serviceType + "::" + methodSignature;
     }
 
     @Override
     public Method getResourceMethod() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (method != null) {
+            return method;
+        }
+
+        Lock readLock = METHOD_MAP_LOCK.readLock();
+        readLock.lock();
+        try {
+            method = METHOD_MAP.get(mapKey);
+            if (method != null) {
+                return method;
+            }
+        } finally {
+            readLock.unlock();
+        }
+
+        loadResourceClass();
+
+        for (Method m : resourceClass.getDeclaredMethods()) {
+            if (methodSignature(m).equals(methodSignature)) {
+                Lock writeLock = METHOD_MAP_LOCK.writeLock();
+                writeLock.lock();
+                try {
+                    METHOD_MAP.put(mapKey, m);
+                    method = m;
+                } finally {
+                    writeLock.unlock();
+                }
+                return method;
+            }
+        }
+
+        throw new IllegalStateException("Method not found: " + methodSignature);
     }
 
     @Override
     public Class<?> getResourceClass() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (resourceClass != null) {
+            return resourceClass;
+        }
+        loadResourceClass();
+        return resourceClass;
+    }
+
+    void loadResourceClass() {
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        try {
+            resourceClass = loader.loadClass(serviceType);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    static String methodSignature(Method m) {
+        String returnType = m.getReturnType().getTypeName();
+        String name = m.getName();
+        String params = Arrays.stream(m.getParameterTypes())
+                .map(Class::getTypeName)
+                .collect(Collectors.joining(", "));
+        return String.format("%s %s(%s)", returnType, name, params).trim();
     }
 }

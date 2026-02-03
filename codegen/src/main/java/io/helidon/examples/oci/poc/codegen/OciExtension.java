@@ -87,7 +87,8 @@ class OciExtension implements RegistryCodegenExtension {
                 .addImport("java.util.HashSet")
                 .addImport("io.helidon.examples.oci.poc.echo.AuthorizationFilter")
                 .addImport("io.helidon.examples.oci.poc.jaxrs.HelidonContainerRequestContext")
-                .addImport("io.helidon.examples.oci.poc.jaxrs.HelidonContextInjector");
+                .addImport("io.helidon.examples.oci.poc.jaxrs.HelidonContextInjector")
+                .addImport("io.helidon.examples.oci.poc.jaxrs.HelidonResourceInfo");
 
         builder.addField(field -> field.name("LOGGER")
                 .isStatic(true)
@@ -128,28 +129,31 @@ class OciExtension implements RegistryCodegenExtension {
                 .addParameter(p -> p.type(OciTypes.SERVER_RESPONSE)
                         .name("response"))
                 .addThrows(t -> t.type(Exception.class))
-                .addContentLine("""
-                                        TypedElementInfo typedElementInfo = interceptionContext.elementInfo();
-                                         String method = interceptionContext.serviceInfo().serviceType().toString() + "::" + typedElementInfo.signature();
-                                        
-                                         if (INTERCEPTED_METHODS.contains(method)) {
-                                             LOGGER.log(System.Logger.Level.DEBUG, "Intercepting call '" + typedElementInfo.signature() + "'");
-                                        
-                                             AuthorizationFilter filter = new AuthorizationFilter();
-                                             HelidonContainerRequestContext context = new HelidonContainerRequestContext(request);
-                                             HelidonContextInjector.inject(filter, context);
-                                             HelidonContextInjector.postConstruct(filter);
-                                        
-                                             filter.filter(context);
-                                        
-                                             if (context.isAborted()) {
-                                                String msg = context.getAbortMessage();
-                                                response.status(context.getAbortStatus()).send(msg != null ? msg : "");
-                                                return;
-                                             }
-                                         }
-                            
-                                         chain.proceed(request, response);"""));
+                .addContentLine("""        
+        TypedElementInfo typedElementInfo = interceptionContext.elementInfo();
+        String serviceType = interceptionContext.serviceInfo().serviceType().toString();
+        String methodSignature = typedElementInfo.signature().toString();
+        String method = serviceType + "::" + methodSignature;
+
+        if (INTERCEPTED_METHODS.contains(method)) {
+            LOGGER.log(System.Logger.Level.DEBUG, "Intercepting call '" + typedElementInfo.signature() + "'");
+
+            AuthorizationFilter filter = new AuthorizationFilter();
+            HelidonResourceInfo resourceInfo = new HelidonResourceInfo(serviceType, methodSignature);
+            HelidonContainerRequestContext context = new HelidonContainerRequestContext(request, resourceInfo);
+            HelidonContextInjector.inject(filter, context);
+            HelidonContextInjector.postConstruct(filter);
+
+            filter.filter(context);
+
+            if (context.isAborted()) {
+                String msg = context.getAbortMessage();
+                response.status(context.getAbortStatus()).send(msg != null ? msg : "");
+                return;
+            }
+        }
+
+        chain.proceed(request, response);"""));
 
         roundContext.addGeneratedType(generatedType,
                                       builder,

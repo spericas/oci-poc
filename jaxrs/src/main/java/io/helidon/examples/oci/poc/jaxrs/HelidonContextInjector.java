@@ -66,7 +66,7 @@ public class HelidonContextInjector {
                     if (fieldType.equals(UriInfo.class)) {
                         field.set(instance, new HelidonUriInfo(context.getServerRequest()));
                     } else if (fieldType.equals(ResourceInfo.class)) {
-                        field.set(instance, new HelidonResourceInfo(context.getServerRequest()));
+                        field.set(instance, context.getResourceInfo());
                     } else if (fieldType.equals(HttpServletRequest.class)) {
                         field.set(instance, new HelidonHttpServletRequest(context.getServerRequest()));
                     } else {

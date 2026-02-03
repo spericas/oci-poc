@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import io.helidon.webserver.http.ServerRequest;
 
@@ -51,19 +52,12 @@ public class HelidonContainerRequestContext implements ContainerRequestContext {
     private final HelidonUriInfo uriInfo;
     private final HelidonHttpHeaders httpHeaders;
     private final Map<String, Object> properties = new HashMap<>();
+    private final ResourceInfo resourceInfo;
     private SecurityContext securityContext;
-    private ResourceInfo resourceInfo;
     private boolean aborted = false;
     private int abortStatus = 0;
     private String abortMessage;
     private InputStream entityStream;
-
-    public HelidonContainerRequestContext(ServerRequest request) {
-        this.request = request;
-        this.uriInfo = new HelidonUriInfo(request);
-        this.httpHeaders = new HelidonHttpHeaders(request);
-    }
-
     /**
      * Create a request context with ResourceInfo for post-matching filters.
      *
@@ -71,9 +65,11 @@ public class HelidonContainerRequestContext implements ContainerRequestContext {
      * @param resourceInfo the matched resource info
      */
     public HelidonContainerRequestContext(ServerRequest request, ResourceInfo resourceInfo) {
-        this(request);
+        Objects.requireNonNull(resourceInfo, "resourceInfo is null");
+        this.request = request;
+        this.uriInfo = new HelidonUriInfo(request);
+        this.httpHeaders = new HelidonHttpHeaders(request);
         this.resourceInfo = resourceInfo;
-        // Also store in properties for filters that access it via getProperty()
         this.properties.put(RESOURCE_INFO_PROPERTY, resourceInfo);
     }
 
@@ -85,16 +81,6 @@ public class HelidonContainerRequestContext implements ContainerRequestContext {
      */
     public ResourceInfo getResourceInfo() {
         return resourceInfo;
-    }
-
-    /**
-     * Set the ResourceInfo for the matched resource method.
-     *
-     * @param resourceInfo the resource info
-     */
-    public void setResourceInfo(ResourceInfo resourceInfo) {
-        this.resourceInfo = resourceInfo;
-        this.properties.put(RESOURCE_INFO_PROPERTY, resourceInfo);
     }
 
     @Override
