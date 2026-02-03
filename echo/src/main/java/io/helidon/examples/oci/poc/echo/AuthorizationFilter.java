@@ -21,6 +21,7 @@ import java.util.List;
 import io.helidon.http.HeaderNames;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.container.ResourceInfo;
@@ -39,6 +40,9 @@ public class AuthorizationFilter implements ContainerRequestFilter {
 
     @Context
     private ResourceInfo resourceInfo;
+
+    @Context
+    private HttpServletRequest servletRequest;
 
     public AuthorizationFilter() {
     }
@@ -72,6 +76,9 @@ public class AuthorizationFilter implements ContainerRequestFilter {
         Method method = resourceInfo.getResourceMethod();
         if (clazz == null || method == null) {
             throw new IllegalStateException("Missing ResourceInfo class and method");
+        }
+        if (servletRequest == null) {
+            throw new IllegalStateException("Missing ServletRequest");
         }
     }
 }

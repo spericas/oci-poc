@@ -59,6 +59,7 @@ public class EchoEndpointTest {
                 .accept(MediaTypes.TEXT_PLAIN)
                 .contentType(MediaTypes.TEXT_PLAIN)
                 .header(HeaderNames.AUTHORIZATION, "helidon")
+                .queryParam("foo", "bar")
                 .submit("Hello World", String.class);
 
         assertThat(response.status(), is(Status.OK_200));
@@ -73,6 +74,7 @@ public class EchoEndpointTest {
                 .accept(MediaTypes.TEXT_PLAIN)
                 .contentType(MediaTypes.TEXT_PLAIN)
                 .header(HeaderNames.AUTHORIZATION, "helidon")
+                .queryParam("foo", "bar")
                 .submit("Hello World", String.class);
 
         assertThat(response.status(), is(Status.OK_200));

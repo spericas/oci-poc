@@ -51,6 +51,31 @@ public class HelidonHttpServletRequest implements HttpServletRequest {
     }
 
     @Override
+    public StringBuffer getRequestURL() {
+        String uri = request.requestedUri().toUri().toString();
+        int k = uri.indexOf('?');
+        return new StringBuffer().append(k > 0 ? uri.substring(0, k) : uri);
+    }
+
+    @Override
+    public String getQueryString() {
+        return request.query().rawValue();         // not decoded
+    }
+
+
+    @Override
+    public String getLocalAddr() {
+        return request.localPeer().host();
+    }
+
+    @Override
+    public int getLocalPort() {
+        return request.localPeer().port();
+    }
+
+    // ------------------------------------------------------------------------
+
+    @Override
     public String getAuthType() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
@@ -106,11 +131,6 @@ public class HelidonHttpServletRequest implements HttpServletRequest {
     }
 
     @Override
-    public String getQueryString() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
     public String getRemoteUser() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
@@ -135,10 +155,6 @@ public class HelidonHttpServletRequest implements HttpServletRequest {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
-    public StringBuffer getRequestURL() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 
     @Override
     public String getServletPath() {
@@ -337,16 +353,6 @@ public class HelidonHttpServletRequest implements HttpServletRequest {
 
     @Override
     public String getLocalName() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public String getLocalAddr() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public int getLocalPort() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
