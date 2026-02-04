@@ -21,9 +21,9 @@ import java.lang.reflect.Method;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.container.ResourceInfo;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.UriInfo;
+import javax.ws.rs.container.ResourceInfo;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
 
 public class HelidonContextInjector {
 
@@ -33,7 +33,7 @@ public class HelidonContextInjector {
     /**
      * Performs field‑level injection of JAX‑RS {@code @Context}‑annotated members on the supplied
      * {@code instance}.  The method inspects every declared field of the object's runtime class,
-     * looks for the {@link jakarta.ws.rs.core.Context} annotation and, if present, attempts to set
+     * looks for the {@link javax.ws.rs.core.Context} annotation and, if present, attempts to set
      * the field to an appropriate Helidon‑specific implementation based on the field type.
      *
      * <p>If a field is annotated with {@code @Context} but its type is not one of the

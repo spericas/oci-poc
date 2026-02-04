@@ -29,7 +29,7 @@ import io.helidon.http.HeaderNames;
 import io.helidon.http.HeaderValues;
 import io.helidon.webserver.http.ServerRequest;
 
-import jakarta.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.MultivaluedMap;
 
 public class HelidonMultivaluedHashMap implements MultivaluedMap<String, String> {
 

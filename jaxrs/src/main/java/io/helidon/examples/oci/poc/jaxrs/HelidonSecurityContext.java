@@ -22,7 +22,7 @@ import java.util.Set;
 
 import io.helidon.webserver.http.ServerRequest;
 
-import jakarta.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.SecurityContext;
 
 /**
  * Wrapper that adapts Helidon's ServerRequest to JAX-RS SecurityContext.

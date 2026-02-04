@@ -27,15 +27,15 @@ import java.util.Objects;
 
 import io.helidon.webserver.http.ServerRequest;
 
-import jakarta.ws.rs.container.ContainerRequestContext;
-import jakarta.ws.rs.container.ResourceInfo;
-import jakarta.ws.rs.core.Cookie;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.MultivaluedMap;
-import jakarta.ws.rs.core.Request;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.SecurityContext;
-import jakarta.ws.rs.core.UriInfo;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ResourceInfo;
+import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.UriInfo;
 
 /**
  * Wrapper that adapts Helidon's ServerRequest to JAX-RS ContainerRequestContext.
@@ -46,7 +46,7 @@ import jakarta.ws.rs.core.UriInfo;
 public class HelidonContainerRequestContext implements ContainerRequestContext {
 
     /** Property key for storing ResourceInfo in the context. */
-    public static final String RESOURCE_INFO_PROPERTY = "jakarta.ws.rs.container.ResourceInfo";
+    public static final String RESOURCE_INFO_PROPERTY = "javax.ws.rs.container.ResourceInfo";
 
     private final ServerRequest request;
     private final HelidonUriInfo uriInfo;

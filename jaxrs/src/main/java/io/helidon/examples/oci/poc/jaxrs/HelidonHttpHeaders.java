@@ -23,10 +23,10 @@ import java.util.Map;
 
 import io.helidon.webserver.http.ServerRequest;
 
-import jakarta.ws.rs.core.Cookie;
-import jakarta.ws.rs.core.HttpHeaders;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 
 /**
  * Wrapper that adapts Helidon's ServerRequest headers to JAX-RS HttpHeaders.

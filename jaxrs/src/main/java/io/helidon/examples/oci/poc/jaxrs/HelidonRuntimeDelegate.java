@@ -15,16 +15,12 @@
  */
 package io.helidon.examples.oci.poc.jaxrs;
 
-import java.util.concurrent.CompletionStage;
-
-import jakarta.ws.rs.SeBootstrap;
-import jakarta.ws.rs.core.Application;
-import jakarta.ws.rs.core.EntityPart;
-import jakarta.ws.rs.core.Link;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriBuilder;
-import jakarta.ws.rs.core.Variant;
-import jakarta.ws.rs.ext.RuntimeDelegate;
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Link;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.Variant;
+import javax.ws.rs.ext.RuntimeDelegate;
 
 public class HelidonRuntimeDelegate extends RuntimeDelegate {
 
@@ -56,27 +52,6 @@ public class HelidonRuntimeDelegate extends RuntimeDelegate {
 
     @Override
     public Link.Builder createLinkBuilder() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public SeBootstrap.Configuration.Builder createConfigurationBuilder() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public CompletionStage<SeBootstrap.Instance> bootstrap(Application application, SeBootstrap.Configuration configuration) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public CompletionStage<SeBootstrap.Instance> bootstrap(Class<? extends Application> clazz,
-                                                           SeBootstrap.Configuration configuration) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public EntityPart.Builder createEntityPartBuilder(String partName) throws IllegalArgumentException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 }

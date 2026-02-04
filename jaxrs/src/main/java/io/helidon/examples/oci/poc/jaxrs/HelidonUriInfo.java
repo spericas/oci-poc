@@ -21,11 +21,11 @@ import java.util.List;
 
 import io.helidon.webserver.http.ServerRequest;
 
-import jakarta.ws.rs.core.MultivaluedHashMap;
-import jakarta.ws.rs.core.MultivaluedMap;
-import jakarta.ws.rs.core.PathSegment;
-import jakarta.ws.rs.core.UriBuilder;
-import jakarta.ws.rs.core.UriInfo;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 /**
  * Wrapper that adapts Helidon's ServerRequest to JAX-RS UriInfo.

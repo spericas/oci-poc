@@ -24,7 +24,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
-import jakarta.ws.rs.container.ResourceInfo;
+import javax.ws.rs.container.ResourceInfo;
 
 public class HelidonResourceInfo implements ResourceInfo {
 
